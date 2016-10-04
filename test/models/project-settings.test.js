@@ -1,4 +1,5 @@
 import ProjectSettings from 'models/project-settings';
+import path from 'path';
 import fs from 'fs';
 import fse from 'fs-extra';
 import config from 'config';
@@ -7,6 +8,8 @@ import { fileExists } from 'util/fs';
 const { basePath } = config;
 const settingsPath = basePath + '/.reduxrc';
 const templatePath = basePath + '/templates/.reduxrc';
+
+const packageCache = require(path.join(basePath, 'package.json'));
 
 describe('ProjectSettings', () => {
   beforeEach(() => {
@@ -77,6 +80,24 @@ describe('ProjectSettings', () => {
       );
       const settings = new ProjectSettings();
       expect(settings.getSetting('test')).to.eql('works!');
+    });
+
+    it('loads settings from package.json', () => {
+      fs.writeFileSync(
+        path.join(basePath, 'package.json'), JSON.stringify({
+          redux: {
+            test: 'it works!'
+          }
+        })
+      );
+      const settings = new ProjectSettings();
+      expect(settings.getSetting('test')).to.eql('it works!');
+
+      // cleanup
+      fs.writeFileSync(
+        path.join(basePath, 'package.json'),
+        JSON.stringify(packageCache, null, '  ') + '\n'
+      );
     });
 
     it('creates a new .reduxrc if not present', () => {
