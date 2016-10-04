@@ -18,14 +18,16 @@ export default class ProjectSettings {
   }
 
   loadSettings() {
-    if (!this.settingsExist()) {
-      this.buildFromTemplate();
+    const packageSettings = jf.readFileSync(path.join(pwd(), 'package.json')).redux;
+
+    if (packageSettings) {
+      this.settings = packageSettings;
+      return;
     }
-    this.settings = Object.assign(
-      {},
-      jf.readFileSync(path.join(pwd(), 'package.json')).redux,
-      jf.readFileSync(this.settingsPath())
-    );
+
+    if (!this.settingsExist()) { this.buildFromTemplate(); }
+
+    this.settings = jf.readFileSync(this.settingsPath());
   }
 
   templatePath() {
