@@ -83,21 +83,23 @@ describe('ProjectSettings', () => {
     });
 
     it('loads settings from package.json', () => {
-      fs.writeFileSync(
-        path.join(basePath, 'package.json'), JSON.stringify({
-          redux: {
-            test: 'it works!'
-          }
-        })
-      );
-      const settings = new ProjectSettings();
-      expect(settings.getSetting('test')).to.eql('it works!');
-
-      // cleanup
-      fs.writeFileSync(
-        path.join(basePath, 'package.json'),
-        JSON.stringify(packageCache, null, '  ') + '\n'
-      );
+      try {
+        fs.writeFileSync(
+          path.join(basePath, 'package.json'), JSON.stringify({
+            redux: {
+              test: 'it works!'
+            }
+          })
+        );
+        const settings = new ProjectSettings();
+        expect(settings.getSetting('test')).to.eql('it works!');
+      } finally {
+        // cleanup
+        fs.writeFileSync(
+          path.join(basePath, 'package.json'),
+          JSON.stringify(packageCache, null, '  ') + '\n'
+        );
+      }
     });
 
     it('creates a new .reduxrc if not present', () => {
